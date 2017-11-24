@@ -1,4 +1,6 @@
 import csv
+import numpy as np
+import matplotlib.pyplot as plt
 from math import sin, cos, sqrt, atan2, radians
 
 def euclideanDistance((x1, y1), (x2, y2)):
@@ -36,6 +38,16 @@ def cleanData(coordinates):
     for i in range(0, len(coordinates)-1):
         addresses.append((coordinates[i], coordinates[i+1]))
     return addresses
+
+def graphClusters(clusters, centroids):
+    colors = ['r', 'g', 'b', 'y', 'c', 'm']
+    centroids = zip(*centroids.values())
+    for i in range(len(clusters.keys())):
+        zipCoordinates = zip(*clusters[i])
+        print colors[i]
+        plt.scatter(zipCoordinates[0], zipCoordinates[1], c=colors[i])
+    plt.scatter(centroids[0], centroids[1], c='r')
+    plt.show()
 
 
 

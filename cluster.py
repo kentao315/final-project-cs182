@@ -1,5 +1,6 @@
 import util
 import random
+import numpy as np
 
 class Cluster:
     def __init__(self):
@@ -13,22 +14,23 @@ class Cluster:
         ## self.centroids[cluster] = centroid
         self.centroids = {}
 
-    def euclideanDistance(self,(x1, y1), (x2, y2)):
+    def euclideanDistance(self, (x1, y1), (x2, y2)):
         return util.euclideanDistance((x1, y1), (x2, y2))
 
     def kmeans(self, addresses, k):
-        for elt in addresses:
-            ## randomly assign coordinates to cluster
-            randomInt = random.randint(0, k - 1)
-            if randomInt in self.clusters:
-                self.clusters[randomInt].append(elt)
-            else:
-                self.clusters[randomInt] = [elt]
-        ## update centroids given new clustering
-        self.centroids = self.update(self.clusters)
 
+        ## randomly select points as centroids
+        indices = np.random.choice(len(np.array(addresses)), size=k, replace=False)
+        print indices
+        for i in range(k):
+            self.centroids[i] = addresses[indices[i]]
+        print "Initial Centroids: ", self.centroids
+        self.clusters = self.assignment(addresses, self.centroids, k)
+        self.centroids = self.update(self.clusters)
+        print "After 1 step: ", self.centroids
         ## while the clustering assignments change continue algorithm
         while True:
+            print "looping"
             newClusters = self.assignment(addresses, self.centroids, k)
             if self.clusters == newClusters:
                 return self.clusters, self.centroids
@@ -46,12 +48,13 @@ class Cluster:
         :return:
         """
         newClusters = {}
+        print centroids
         for (lat, long) in addresses:
             minDistance = float('Inf')
             minIndex = 0
             for i in range(k):
-                if self.euclideanDistance((lat, long), centroids[i]) < minDistance:
-                    minDistance = self.euclideanDistance((lat, long), centroids[i])
+                if pow(self.euclideanDistance((lat, long), centroids[i]),2) < minDistance:
+                    minDistance = pow(self.euclideanDistance((lat, long), centroids[i]),2)
                     minIndex = i
             if minIndex in newClusters:
                 newClusters[minIndex].append((lat, long))
